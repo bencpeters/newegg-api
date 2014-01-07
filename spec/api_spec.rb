@@ -26,6 +26,118 @@ describe Newegg::Api do
     end
   end
 
+  describe "get_store_id_by_name" do
+    api = Newegg::Api.new
+    stores = Hash[api.stores.collect{|s| [s.title, s.store_id]}]
+    stores.each do |name, id|
+      context "with the exact name '#{name}'" do
+        it "should find the correct store_id" do
+          expect(@api.get_store_id_by_name name).to eq(id)
+        end
+      end
+    end
+
+    stores = {'Hardware' => 1,
+              'Laptops' => 3,
+              'Notebooks' => 3,
+              'PCs' => 3,
+              'Electronics' => 10,
+              'Software' => 6,
+              'Gaming' => 8,
+              'Games' => 8,
+              'Computer Games' => 8,
+              'Phones' => 140,
+              'Home' => 15,
+              'Outdoors' => 15,
+              'Automotive' => 19,
+              'Office' => 133,
+              'Market' => 14,
+              'Auto' => 19}
+    stores.each do |name, id|
+      context "with the fuzzy match '#{name}'" do
+        it "should find the correct store_id" do
+          expect(@api.get_store_id_by_name name).to eq(id)
+        end
+      end
+    end
+
+    context "with the unrelated name 'NotAStore'" do
+      it "should return nil" do
+        expect(@api.get_store_id_by_name "NotAStore").to be_nil
+      end
+    end
+  end
+
+  describe "get_category_id_by_name" do
+    let(:name) { 'CPU' }
+
+    subject { @api.get_category_id_by_name name, store_id }
+
+    context "with a valid store_id" do
+      api = Newegg::Api.new
+      store_id = api.stores.first.store_id 
+      categories = Hash[api.categories(store_id).collect do |c|
+        [c.description, c.category_id]
+      end]
+
+      let(:store_id) { store_id }
+
+      categories.each do |desc, id|
+        context "with the exact match: '#{desc}'" do
+          let(:name) { desc }
+          it "should find the correct category_id" do
+            expect(subject).to eq(id)
+          end
+        end
+      end
+
+      categories = {'Backup Devices' => 2,
+                    'Backup Media' => 2,
+                    'Barebone Computers' => 3,
+                    'Mini Computers' => 3,
+                    'CD' => 10,
+                    'DVD' => 10,
+                    'Blu-Ray' => 10,
+                    'CPU' => 34,
+                    'Processors' => 34,
+                    'Fans' => 11,
+                    'PC Cooling' => 11,
+                    'Flash Memory' => 324,
+                    'Keyboards' => 234,
+                    'Mice' => 234,
+                    'Memory' => 17,
+                    'Motherboards' => 20,
+                    'Networking' => 281,
+                    'Printers' => 33,
+                    'Scanners' => 33,
+                    'Servers' => 271,
+                    'Workstations' => 271}
+
+      categories.each do |desc, id|
+        context "with the fuzzy match: '#{desc}'" do
+          let(:name) { desc }
+          it "should find the correct category_id" do
+            expect(subject).to eq(id)
+          end
+        end
+      end
+    end
+
+    context "with an invalid store_id" do
+      let(:store_id) { 24322 }
+      it "should return nil" do
+        expect(subject).to be_nil
+      end
+    end
+
+    context "with a nil store_id" do
+      let(:store_id) { nil }
+      it "should return nil" do
+        expect(subject).to be_nil
+      end
+    end
+  end
+
   describe "categories()" do
     subject { @api.categories(store_id) }
     context "with a valid store_id" do
