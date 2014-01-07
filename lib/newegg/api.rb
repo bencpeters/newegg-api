@@ -39,7 +39,8 @@ module Newegg
     # @param [String] name of the store
     #
     def get_store_id_by_name(name)
-      name = name.sub(/notebook*/i, 'laptop')
+      return nil if name.nil?
+      name = name.sub(/notebook*/i, 'laptop') 
       # Groupings help increase matching accuracy. Might be overkill though
       store = search_for_name(name, stores, :title, 
                               [/hardware/i,
@@ -71,6 +72,7 @@ module Newegg
     # @param [optional, String] store_id to look in for categories
     #
     def get_category_id_by_name(name, store_id)
+      return nil if name.nil?
       categories = categories store_id
       cat = search_for_name(name, categories, :description)
       cat.category_id unless cat.nil?

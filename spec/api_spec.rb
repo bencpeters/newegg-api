@@ -27,12 +27,15 @@ describe Newegg::Api do
   end
 
   describe "get_store_id_by_name" do
+    subject { @api.get_store_id_by_name name }
+
     api = Newegg::Api.new
     stores = Hash[api.stores.collect{|s| [s.title, s.store_id]}]
     stores.each do |name, id|
       context "with the exact name '#{name}'" do
+        let(:name) { name }
         it "should find the correct store_id" do
-          expect(@api.get_store_id_by_name name).to eq(id)
+          expect(subject).to eq(id)
         end
       end
     end
@@ -55,15 +58,24 @@ describe Newegg::Api do
               'Auto' => 19}
     stores.each do |name, id|
       context "with the fuzzy match '#{name}'" do
+        let(:name) { name }
         it "should find the correct store_id" do
-          expect(@api.get_store_id_by_name name).to eq(id)
+          expect(subject).to eq(id)
         end
       end
     end
 
     context "with the unrelated name 'NotAStore'" do
+      let(:name) { "NotAStore" }
       it "should return nil" do
-        expect(@api.get_store_id_by_name "NotAStore").to be_nil
+        expect(subject).to be_nil
+      end
+    end
+
+    context "with a nil name" do
+      let(:name) { nil }
+      it "should return nil" do
+        expect(subject).to be_nil
       end
     end
   end
@@ -119,6 +131,13 @@ describe Newegg::Api do
           it "should find the correct category_id" do
             expect(subject).to eq(id)
           end
+        end
+      end
+
+      context "with a nil category_id" do
+        let(:name) { nil }
+        it "should return nil" do
+          expect(subject).to be_nil
         end
       end
     end
