@@ -26,8 +26,11 @@ describe Newegg::Api do
     end
   end
 
-  describe "get_store_id_by_name" do
-    subject { @api.get_store_id_by_name name }
+  describe "get_store_by_name" do
+    subject do
+      store = @api.get_store_by_name name 
+      store.store_id unless store.nil?
+    end
 
     api = Newegg::Api.new
     stores = Hash[api.stores.collect{|s| [s.title, s.store_id]}]
@@ -80,10 +83,38 @@ describe Newegg::Api do
     end
   end
 
-  describe "get_category_id_by_name" do
+  describe "get_store_id_by_name" do
+    subject { @api.get_store_id_by_name name }
+    context "with a valid name" do
+      let(:name) { 'Computer Hardware' }
+      it "should find the correct id" do
+        ref_id = @api.get_store_by_name(name).store_id
+        expect(subject).to eq(ref_id)
+      end
+    end
+    
+    context "with an invalid name" do
+      let(:name) { 'NotAStore' }
+      it "should return nil" do
+        expect(subject).to be_nil
+      end
+    end
+    
+    context "with a nil name" do
+      let(:name) { nil }
+      it "should return nil" do
+        expect(subject).to be_nil
+      end
+    end
+  end
+
+  describe "get_category_by_name" do
     let(:name) { 'CPU' }
 
-    subject { @api.get_category_id_by_name name, store_id }
+    subject do
+      cat = @api.get_category_by_name name, store_id
+      cat.category_id unless cat.nil?
+    end
 
     context "with a valid store_id" do
       api = Newegg::Api.new
@@ -134,7 +165,41 @@ describe Newegg::Api do
         end
       end
 
-      context "with a nil category_id" do
+      context "with a nil name" do
+        let(:name) { nil }
+        it "should return nil" do
+          expect(subject).to be_nil
+        end
+      end
+    end
+
+    context "with an invalid store_id" do
+      let(:store_id) { 24322 }
+      it "should return nil" do
+        expect(subject).to be_nil
+      end
+    end
+
+    context "with a nil store_id" do
+      let(:store_id) { nil }
+      it "should return nil" do
+        expect(subject).to be_nil
+      end
+    end
+  end
+
+  describe "get_category_id_by_name" do
+    let(:name) {'CPU'}
+    subject { @api.get_category_id_by_name name, store_id }
+
+    context "with a valid store_id" do
+      let(:store_id) { @api.stores.first.store_id }
+      it "should find the correct category_id" do
+        ref_id = @api.get_category_by_name(name, store_id).category_id
+        expect(subject).to eq(ref_id)
+      end
+
+      context "with a nil category_name" do
         let(:name) { nil }
         it "should return nil" do
           expect(subject).to be_nil
