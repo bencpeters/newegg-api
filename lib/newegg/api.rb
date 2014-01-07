@@ -62,6 +62,19 @@ module Newegg
       ])
       store.store_id unless store.nil?
     end
+
+    #
+    # retrieve the best matching category_id by name from all the categories that match the
+    # store_id (or optionally provide a list of categories to search within)
+    #
+    # @param [String] name of the category to look for
+    # @param [optional, String] store_id to look in for categories
+    #
+    def get_category_id_by_name(name, store_id)
+      categories = categories store_id
+      cat = search_for_name(name, categories, :description)
+      cat.category_id unless cat.nil?
+    end
     
     #
     # retrieve and populate list of categories for a given store_id
