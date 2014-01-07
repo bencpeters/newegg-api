@@ -26,6 +26,48 @@ describe Newegg::Api do
     end
   end
 
+  describe "get_store_id_by_name" do
+    api = Newegg::Api.new
+    stores = Hash[api.stores.collect{|s| [s.title, s.store_id]}]
+    stores.each do |name, id|
+      context "with the exact name '#{name}'" do
+        it "should find the correct store_id" do
+          expect(@api.get_store_id_by_name name).to eq(id)
+        end
+      end
+    end
+
+    stores = {'Hardware' => 1,
+              'Laptops' => 3,
+              'Notebooks' => 3,
+              'PCs' => 3,
+              'Electronics' => 10,
+              'Software' => 6,
+              'Gaming' => 8,
+              'Games' => 8,
+              'Computer Games' => 8,
+              'Phones' => 140,
+              'Home' => 15,
+              'Outdoors' => 15,
+              'Automotive' => 19,
+              'Office' => 133,
+              'Market' => 14,
+              'Auto' => 19}
+    stores.each do |name, id|
+      context "with the fuzzy match '#{name}'" do
+        it "should find the correct store_id" do
+          expect(@api.get_store_id_by_name name).to eq(id)
+        end
+      end
+    end
+
+    context "with the unrelated name 'NotAStore'" do
+      it "should return nil" do
+        expect(@api.get_store_id_by_name "NotAStore").to be_nil
+      end
+    end
+  end
+
   describe "categories()" do
     subject { @api.categories(store_id) }
     context "with a valid store_id" do

@@ -1,6 +1,7 @@
 module Newegg
   require "json"
   require "faraday"
+  require "fuzzy_match"
 
   require "newegg/api"
   require "newegg/error"

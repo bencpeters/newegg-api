@@ -32,6 +32,36 @@ module Newegg
       end
       self._stores
     end
+
+    #
+    # retrieve the best matching store_id by name
+    #
+    # @param [String] name of the store
+    #
+    def get_store_id_by_name(name)
+      name = name.sub(/notebook*/i, 'laptop')
+      # Groupings help increase matching accuracy. Might be overkill though
+      store = search_for_name(name, stores, :title, 
+                              [/hardware/i,
+                               /ultrabook/i,
+                               /pc/i,
+                               /laptop/i,
+                               /notebook/i,
+                               /electronic/i,
+                               /software/i,
+                               /gam*/i,
+                               /cell*/i,
+                               /phone/i,
+                               /home/i,
+                               /outdoor/i,
+                               /auto/i,
+                               /office/i,
+                               /accessories/i,
+                               /services/i,
+                               /market*/i
+      ])
+      store.store_id unless store.nil?
+    end
     
     #
     # retrieve and populate list of categories for a given store_id
@@ -157,6 +187,19 @@ module Newegg
       else
         response
       end
+    end
+
+    #
+    # Perform fuzzy search for the name on the specified list
+    #
+    # @param [String] name to look for
+    # @param [Array] list of possible names
+    # @param [Symbol] field of each item to search in for the name
+    # @param [optional, Symbol] list of groupings to improve search performance
+    #
+    def search_for_name(name, list, field, groupings=[])
+      fz = FuzzyMatch.new(list, read: field, groupings: groupings)
+      fz.find(name)
     end
     
   end

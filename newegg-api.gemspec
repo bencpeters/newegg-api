@@ -39,6 +39,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
   spec.add_dependency(%q<json>,['~>1.7'])
   spec.add_dependency(%q<faraday>,['~>0.8'])
+  spec.add_dependency(%q<fuzzy_match>,['~>2.0'])
   spec.add_development_dependency(%q<simplecov>)
   spec.add_development_dependency(%q<fakeweb>,['~>1.3'])
   spec.add_development_dependency(%q<rspec>,['~>2.11'])
