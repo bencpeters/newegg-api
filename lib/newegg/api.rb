@@ -38,7 +38,7 @@ module Newegg
     #
     # @param [String] name of the store
     #
-    def get_store_id_by_name(name)
+    def get_store_by_name(name)
       return nil if name.nil?
       name = name.sub(/notebook*/i, 'laptop') 
       # Groupings help increase matching accuracy. Might be overkill though
@@ -61,20 +61,42 @@ module Newegg
                                /services/i,
                                /market*/i
       ])
-      store.store_id unless store.nil?
     end
 
     #
-    # retrieve the best matching category_id by name from all the categories that match the
+    # Same as get_store_by_name, but returns nil or store_id rather than full store
+    # object
+    #
+    # @param [String] name of the store to look for
+    #
+    def get_store_id_by_name(name)
+      cat = get_store_by_name(name)
+      cat.store_id unless cat.nil?
+    end
+    
+
+    #
+    # retrieve the best matching category by name from all the categories that match the
     # store_id (or optionally provide a list of categories to search within)
     #
     # @param [String] name of the category to look for
     # @param [optional, String] store_id to look in for categories
     #
-    def get_category_id_by_name(name, store_id)
+    def get_category_by_name(name, store_id)
       return nil if name.nil?
       categories = categories store_id
       cat = search_for_name(name, categories, :description)
+    end
+
+    #
+    # Same as get_category_by_name, but returns nil or category_id rather than full category
+    # object
+    #
+    # @param [String] name of the category to look for
+    # @param [optional, String] store_id to look in for categories
+    #
+    def get_category_id_by_name(*args)
+      cat = get_category_by_name(*args)
       cat.category_id unless cat.nil?
     end
     
