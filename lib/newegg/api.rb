@@ -15,7 +15,7 @@ module Newegg
     def connection
       self.conn ||= Faraday.new(:url => 'http://www.ows.newegg.com') do |faraday|
         faraday.request :url_encoded            # form-encode POST params
-        faraday.response :logger                # log requests to STDOUT
+        #faraday.response :logger                # log requests to STDOUT
         faraday.adapter Faraday.default_adapter # make requests with Net::HTTP
       end      
     end
@@ -143,6 +143,7 @@ module Newegg
     # @param [String] keywords   
     #
     def search(options={})
+      options.delete_if{|k,v| v.nil?}
       options = {store_id: -1, category_id: -1, sub_category_id: -1, node_id: -1, page_number: 1, sort: "FEATURED",
                  keywords: ""}.merge(options)
       request = {
